@@ -1,0 +1,280 @@
+<html>
+<header>
+<meta charset="UTF-8">
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+<!--Importer les le controller les service et le fichier app-->
+<script src="controllers/controller.js"></script>       
+<script src="services/service.js"></script>
+<script src="app.js"></script>
+<!---->
+<style type="text/css">
+button:active{background-color: blue;color:white;font-weight: bold;border:4px yellow solid;}
+button:visited{background-color: green;border:4px pink solid}
+</style>
+
+
+</header>
+
+<body style="background-image:url('./back.jpg')">
+
+ <div ng-app="myApp" ng-controller="myCtrl">
+    <div class="container-fluid" style="background-color: lightblue;">
+        <div class="row" ng-hide="islogged()" style="padding-top:15%;padding-bottom:15%;">
+            <div class="col-sm-3" >
+
+            </div>
+
+            <div class="col-sm-6" style="background-color: lightblue;">
+                <h1 class="text-center">Bienvenue</h1>
+                <h2 class="text-center">Login</h2>
+                <form ng-submit='login()'>
+                <label for="login">LOGIN:</label>
+                <input type= "text" name="nom" id="nom" class="form-control" value="" ng-model='nom'><p ng-bind='nom'></p><br/>
+
+                <label for="password">PASSWORD</label>
+                <input type= "password" name="pass" class="form-control" value="" ng-model='pass'><br/>
+
+                <input type= "submit" class="form-control btn btn-success" value="go">
+
+                </form> 
+                <!--Bandeau de Notification-->
+                        
+                <p ng-bind="message">message a afficher</p>
+                <p ng-bind="data">message a afficher</p>
+                <p ng-bind="last_connect">message a afficher</p>
+                <p ng-bind="statusMsg">message a afficher</p>
+                <!--Fin du Bandeau de Notification-->
+                <div ng-show="islogged()">
+							<button class="btn btn-lg btn-warning" ng-click="logout()">Deconnection</button>                
+                </div>
+
+            </div>
+            <div class="col-sm-3" >
+
+            </div>
+         </div>
+         <div class="row" ng-show="islogged()">
+         	<div class="col-sm-2">
+				    <span >user: </span><span ng-bind="data">message a afficher</span>     	
+         	</div>
+         	<div class="col-sm-5">
+				    <span>Derniere connection : </span><span ng-bind="last_connect">message a afficher</span> 	
+         	</div>
+         	<div class="col-sm-4">
+				         	<span ng-bind="statusMsg">message a afficher</span>
+                
+            </div>
+            <div class="col-sm-1">
+							<button class="btn btn-sm btn-warning" ng-click="logout()" style="display: inline">logout</button>
+							               
+            </div>
+         </div>
+         <div class="row" ng-show="islogged()">
+         <!--menu-->
+         
+          <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <!-- Brand -->
+  				<a class="navbar-brand" href="#">Quiz Game</a>
+
+  <!-- Links -->
+  					<ul class="navbar-nav">
+   					 <li class="nav-item">
+   					  	 <a class="nav-link" href="#">Accueil</a>
+   					 </li>
+   					 <li class="nav-item">
+     						 <a class="nav-link" href="#">Jeu</a>
+    					</li>
+   					<li class="nav-item">
+     						 <a class="nav-link" href="#">Defi</a>
+    					</li>
+    					<li class="nav-item">
+     						 <a class="nav-link" href="#" ng-click="displayhistorique()">Historique</a>
+    					</li>
+    					<li class="nav-item">
+     						 <a class="nav-link" href="#" ng-click="showupdate()">Profil</a>
+    					</li>
+
+ 				 </ul>
+				</nav> 
+         </div>
+         <div class="row" ng-show="islogged()" style="background-color: yellow;text-align:center;margin-top:50px;height: 250px;box-shadow: 0 10px 10px 0 rgba(0,0,0,0.5);">
+				<div class="col">
+				
+				</div>  
+				<div class="col">       	
+         	<p class="display-1" style="margin-bottom: 30px;text-align:center;margin-top: 30px;">CERIGame</p>
+         	<button class="btn btn-sm btn-warning" ng-click="showtheme()" ng-hide="leveldisplay" style="display: inline">play</button>
+         	<!--<button class="btn btn-sm btn-warning" ng-click="showtheme()" ng-hide="themedisplay" style="display: inline">Choisir le Niveau</button>-->
+         	</div> 
+         	<div class="col">
+         	
+         	</div> 
+         </div>
+         <div class="row" > 
+				<br>
+        		<p class="display-1" ng-show="themedisplay" style="color: gray;font-weight: bold;">Themes</p>
+        		<hr>         
+         </div>
+         <div class="row" style="text-align: center;">
+         
+         <!--Affichage des Themes--> 
+        		
+         	<div class="col-sm-5" ng-show="themedisplay" ng-repeat="x in themeObtenues"
+         	 	  style="box-shadow: 0 10px 20px 0 rgba(0,0,0,0.5);background-color:lightgreen;margin-left: 40px;margin-right: 40px;
+         	 	  margin-bottom: 10px;margin-top: 10px;">
+					 
+				
+					  <button class="btn btn-sm btn-warning" 
+					  ng-click=" showlevel($index)" style="display: inline">
+					  {{x}}
+					  </button>
+					 
+        		</div> 
+
+   			<!--Affichage des niveaux de jeux-->
+   			      
+	         <div class="col-sm-10" ng-show="leveldisplay" ng-repeat="x in niveau">
+					    	<button class="btn btn-sm btn-warning btn-block" ng-click="storeQuestion($index,0)">{{x}}</button>   		
+        		</div>
+        		
+        			
+      	</div>
+      	<div class="row" ng-show="questiondisplay">
+      			<center>
+      			
+      		<!--Affichage du temps restant-->
+      				<p style="color: red;font-weight: bolder;font-size: 20px;"> Temps Ecoulé =  
+      					<span ng-bind="minute"></span>:<span ng-bind="seconde"></span>
+      				</p>
+      				<hr>
+      				<br>
+      				
+      		<!--Affichage du temps Ecoulé-->
+      				<p style="color: red;font-weight: bolder;font-size: 20px;"> Temps de Jeux Restant = 
+      					<span ng-bind="minuteUp"></span>:<span ng-bind="secondeUp"></span>
+      				</p>
+      				<hr>
+      				<br>
+      				
+   			<!--Affichage des Questions et Reponses-->
+					<p ng-bind="quests.question"></p><hr style="border:1px solid gray">
+				
+					<button class="col-sm-12 btn btn-secondary" ng-disabled="disactivate" 
+						ng-repeat="x in quests.propositions" ng-click="checkAnswer(x)" style="margin-left: 40px;margin-right: 40px;
+         	 	  margin-bottom: 10px;margin-top: 10px;">
+         	 	  {{x}}
+         	 	 </button>
+         	 	 <hr>
+         	 	 <br>
+         	 	  <button class="btn btn-primary btn-lg" ng-click="storeQuestion(levelNumber,counter)">Suivant</button>
+				  
+				   <p ng-bind="quests.anecdote"></p>	
+				 </center>
+      	</div>
+      	<div class="row" ng-show="scoredisplay">
+      		<div class="col">
+      			<table class="table table-bordered table-striped" style="font-size: 20px;font-weight:bolder;text-align: center">
+      				<tr>
+      					<td colspan="2">Score:</td>
+      				</tr>
+						<tr>      		
+      					<td>Joueur:</td>
+							<td>{{data}}</td> 
+						</tr>   
+						<tr>      		
+      					<td>Score:</td>
+							<td>{{scorePondere}}</td> 
+						</tr>   
+						<tr>      		
+      					<td>Temps de Jeu:</td>
+							<td>{{duree}}</td> 
+						</tr> 	
+      		
+      			</table>
+      	</div>
+      	
+      	</div>
+      	
+      	<!--Affichage de l'historique-->
+      	<div ng-show="showhistorique" class="row">
+				<div class="col-sm-3">
+				</div>
+				<div class="col-sm-6">
+					<table class="table table-bodered">
+						<tr><td colspan=4> {{pseudo}} </td></tr>
+						<tr style="background-color: black; color:white"><td >Date</td> <td>	Nombre de Reponse </td>	<td>Temps</td>	<td>Score</td></tr>	
+						
+						<tr ng-repeat= "historique in historiques">									
+								<td class="table-active">{{historique.date | date:"dd/MM/yyyy"}}</td>	
+								<td class="table-active">	{{historique.nbreponse}}</td>	
+								<td class="table-active">	{{historique.temps}}</td>	
+								<td class="table-active">	{{historique.score}}</td>								
+						</tr>	
+					</table>
+				</div>
+			</div>
+			
+			<!--Affichage de tous les utilisateurs------------------------------------------------------------------------------------------------------------------------------>
+			<div class="row" ng-show="usersdisplay">
+				<table>
+					<tr><td>Identifiant</td><td>Nom</td><td>Prenom</td><td>Date de Naissance</td><td>Defier</td></tr>	
+					<tr ng_repeat="user in users">
+								<td class="table-active">{{user.identifiant}}</td>	
+								<td class="table-active">	{{user.nom}}</td>	
+								<td class="table-active">	{{user.prenom}}</td>	
+								<td class="table-active">	{{user.date_de_naissance}}</td>	
+					</tr>			
+				</table>
+			</div>
+      	
+      	<!--Modification du profil de lutilisateur-------------------------------------------------------------------------------------------------------------------------->
+      	<div class="row" ng-show="userprofil">
+      	<h2>Mise a jour du Profil de l'Utilisateur</h2>
+      	</div>
+      	<div class="row" ng-show="userprofil">
+          <div class="col-sm-3">
+
+          </div>
+      		<div class="col-sm-6">
+	      	<form ng-submit="updateuser()">
+	      	<div class="form-group">
+                <label>Identifiant</label>
+                <input type= "text" name="userIdentifiant" class="form-control" value="" ng-model='userIdentifiant' ng-value="profil.identifiant"><br/>
+				</div>
+	      	<div class="form-group">
+      			 <label>Nom</label>
+                <input type= "text" name="userNom" id="userNom" class="form-control" value="" ng-model='userNom' ng-value="profil.nom"><p ng-bind="userNom"></p><br/>
+				</div>
+				<div class="form-group">
+                <label>Prenom</label>
+                <input type= "text" name="userPrenom" class="form-control" value="" ng-model='userPrenom' ng-value="profil.prenom"><br/>
+				</div>
+				<!--<div class="form-group">
+                <label>Mot de passe</label>
+                <input type= "text" name="pass" class="form-control" value="" ng-model='userPass' ng-value="profil.motpass"><br/>
+				</div>-->
+				<div class="form-group">
+                <label>Date de Naissance</label>
+                <input type= "text" name="userDate" class="form-control" value="" ng-model='userDate' ng-value="profil.date_de_naissance"><br/>
+				</div>
+				
+				
+                <input type= "submit" class="form-control btn btn-success" value="Update">
+
+   	   	</form>
+   	   	</div>
+      	</div>
+                <p ng-bind="updateStatus"></p>
+</div>
+</div>
+
+	
+
+</body>
+</html>

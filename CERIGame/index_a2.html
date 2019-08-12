@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+  <title>TicTacToe</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.2/angular.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+
+<!--Importer les le controller les service et le fichier app-->
+<script src="controllers/controller_a2.js"></script>       
+<script src="services/service_a2.js"></script>
+<script src="app_a2.js"></script>
+<!---->
+<style type="text/css">
+button:active{background-color: blue;color:white;font-weight: bold;border:4px yellow solid;}
+button:visited{background-color: green;border:4px pink solid}
+a{color:white;}
+td{font-size:30px;font-weight: bolder;height: 120px;width:120px;}
+table button{font-size:40px;font-weight: bolder;height: 117px;width:200px;border:outset 1px white;background-color: rgba(255,255,255,0.5)}
+</style>
+</head>
+
+<body>
+ <div ng-app="myApp" ng-controller="myCtrl">
+    <div class="container-fluid" style="background-color: lightblue;font-family: 'Lobster', cursive;">
+<!--Login-------------------------------------------------------------------------------------------->
+        <div class="row" ng-hide="islogged()" style="padding-top:15%;padding-bottom:15%;">
+            <div class="col-md-3" >
+
+            </div>
+
+            <div class="col-md-6" style="background-color: lightblue;">
+                <h1 class="text-center">Le jeux du morpion</h1>
+                <h2 class="text-center">Bienvenue</h2>
+                <h2 class="text-center">Login</h2>
+                <form ng-submit='login()'>
+                <label for="login">LOGIN:</label>
+                <input type= "text" name="nom" id="nom" class="form-control" value="" ng-model='nom'><br/>
+
+                <label for="password">PASSWORD</label>
+                <input type= "password" name="pass" class="form-control" value="" ng-model='pass'><br/>
+
+                <input type= "submit" class="form-control btn btn-success" value="go">
+
+                </form> 
+                <!--Bandeau de Notification-->
+                        
+                <p ng-bind="message">message a afficher</p>
+                <p ng-bind="data">message a afficher</p>
+                <p ng-bind="last_connect">message a afficher</p>
+                <p ng-bind="statusMsg">message a afficher</p>
+                <!--Fin du Bandeau de Notification-->
+                <div ng-show="islogged()">
+                            <button class="btn btn-lg btn-warning" ng-click="logout()">Deconnection</button>                
+                </div>
+
+            </div>
+            <div class="col-md-3" >
+
+            </div>
+         </div>
+         
+<!--entete-------------------------------------------------------------------------------------------->
+         <div class="row" ng-show="islogged()">
+            <div class="col-md-2">
+                    <span >user: </span><span ng-bind="data">message a afficher</span>      
+            </div>
+            <div class="col-md-5">
+                    <span>Derniere connection : </span><span ng-bind="last_connect">message a afficher</span>   
+            </div>
+            <div class="col-md-4">
+                            <span ng-bind="statusMsg">message a afficher</span>
+                
+            </div>
+            <div class="col-md-1">
+                            <button class="btn btn-sm btn-warning" ng-click="logout()" style="display: inline">logout</button>
+                                           
+            </div>
+         </div>
+<!--menu-------------------------------------------------------------------------------------------->
+         <div class="row" ng-show="islogged()">
+        
+         <div class="col-md-4">
+         </div>
+         <div class="col-md-4">
+            <div class="btn-group">
+  <!-- Brand -->
+                <button class="btn btn-secondary btn-sm"><a href="#">TicTacToe</a></button>
+
+
+                    <a href="#" ng-click="clear()"><button class="btn btn-info btn-md">
+                         Accueil
+                     </button></a>
+                    <a href="#"ng-click="startgame()"><button class="btn btn-secondary btn-md">
+                             Jeu
+                        </button></a>
+                    <a href="#" ng-click="all_users()" style="color:white;"><button class="btn btn-secondary btn-md">
+                             Defier
+                        </button></a>
+             <a href="#" ng-click="questiondefi()" style="color:white;"> <button class="btn btn-secondary btn-md">
+                 Mes Defi
+              </button></a>
+                       <!-- <a href="#" ng-click="displayhistorique()" style="color:white;"><button class="btn btn-secondary btn-sm">
+                             Historique
+              </button></a>
+              <a href="#" ng-click="histdefi()" style="color:white;"><button class="btn btn-secondary btn-sm">
+                 Historique Defi              </button></a>-->
+
+                        <a href="#" ng-click="showupdate()" style="color:white;"><button class="btn btn-secondary btn-md">
+                             Profil
+                        </button></a>
+              
+
+                    </div> 
+          </div>
+         </div>
+<!--Banderole-------------------------------------------------------------------------------------------->
+<div class="row" ng-show="islogged()">
+        <div class="col-md-4">
+            <table class="table table-striped" ng-show="alertConnectionUser1">
+                <tr><td>{{alertConnectionUser}}</td></tr>
+            </table>
+        </div>  
+        <div class="col-md-4" style="background-color:rgba(255,255,255,0.5);text-align:center;margin-top:30px;height: 100px;box-shadow: 0 10px 10px 0 rgba(0,0,0,0.5);">        
+            <p class="display-4" style="margin-bottom: 30px;text-align:center;margin-top: 30px;display: inline">CERIGame </p>
+            <button class="btn btn-lg btn-warning" ng-click="startgame()" ng-hide="leveldisplay" style="display: inline,width:30%">Jouer</button>
+            <!--<button class="btn btn-md btn-warning" ng-click="showtheme()" ng-hide="themedisplay" style="display: inline">Choisir le Niveau</button>-->
+            </div> 
+            <div class="col-md-4">
+            
+            </div> 
+         </div>
+         <div class="row" > 
+                <br>
+                <p class="display-1" ng-show="themedisplay" style="color: gray;font-weight: bold;">Themes</p>
+                <hr>         
+         </div>
+
+
+<!--Debut code pour le jeux du morpion-------------------------------------------------------------------------------------------->
+   
+
+    <div class="row" ng-show="displaychoixpion">
+      <div class="col"></div>
+      <div class="col">
+        <h1>Le jeux du Morpion</h1>
+        <button class="btn btn-secondary" ng-click="choixpion(0)" style="height:150px;width:150px;font-size: 50px;"> X </button>
+        <button class="btn btn-secondary" ng-click="choixpion(1)" style="height:150px;width:150px;font-size: 50px;"> O </button>
+      </div>
+      <div class="col"></div>
+    </div>
+<div class="row" ng-show="boarddisplay">
+  <div class="col-lg-3">
+  </div>
+  <div class="col-lg-6">
+    <p style="color: red;font-weight: bolder;font-size: 20px;"> Temps Ecoulé =  
+        <span ng-bind="minute"></span>:<span ng-bind="seconde"></span>
+    </p>
+    <hr><br>
+    <table class="table table-bordered">
+      <tr><td> <button ng-bind="tab[0]" ng-click="choocell(0,pionchoisi)" ng-disabled='tabdisable[0]'></button></td><td> <button ng-bind="tab[1]" ng-click="choocell(1,pionchoisi)" ng-disabled='tabdisable[1]'></button></td><td> <button ng-bind="tab[2]" ng-click="choocell(2,pionchoisi)" ng-disabled='tabdisable[2]'></button></td></tr>
+      <tr><td><button ng-bind="tab[3]" ng-click="choocell(3,pionchoisi)" ng-disabled='tabdisable[3]'></button></td><td><button ng-bind="tab[4]" ng-click="choocell(4,pionchoisi)" ng-disabled='tabdisable[4]'></button></td><td><button ng-bind="tab[5]" ng-click="choocell(5,pionchoisi)" ng-disabled='tabdisable[5]'></button></td></tr>
+      <tr><td> <button ng-bind="tab[6]" ng-click="choocell(6,pionchoisi)" ng-disabled='tabdisable[6]'>-</td><td><button ng-bind="tab[7]" ng-click="choocell(7,pionchoisi)" ng-disabled='tabdisable[7]'></button></td></td><td> <button ng-bind="tab[8]" ng-click="choocell(8,pionchoisi)" ng-disabled='tabdisable[8]'>-</td></tr>
+    </table>
+  </div>
+  <div class="col-lg-3">
+  </div>
+</div>
+<div class="row" ng-show="endgame()">
+<div class="col-lg-3">
+</div>
+<div class="col-lg-6">
+  <h1>Jeux terminé</h1>
+</div>
+</div>
+<!--FIN code pour le jeux du morpion---------------------------------------------------------------------------------------------->
+        
+<!--Score-------------------------------------------------------------------------------------------->
+        <div class="row" ng-show="scoredisplay">
+          <div class=col-md-2>
+          </div>
+            <div class="col-md-8">
+                <h3 ng-bind="notif"></h3>
+                <table class="table table-bordered table-striped" style="font-size: 20px;font-weight:bolder;text-align: center">
+                    <tr>
+                        <td colspan="2">Score:</td>
+                    </tr>
+                        <tr>            
+                        <td>Joueur:</td>
+                            <td>{{data}}</td> 
+                        </tr>   
+                        <tr>            
+                        <td>Score:</td>
+                            <td>{{score}}</td> 
+                        </tr>   
+                        <tr>            
+                        <td>Temps de Jeu:</td>
+                            <td>{{duree}}</td> 
+                        </tr>   
+            
+                </table>
+            </div>
+        
+        </div>
+        
+        <!--Affichage de l'historique-->
+        <div ng-show="showhistorique" class="row">
+                <div class="col-md-3">
+                </div>
+                <div class="col-md-6">
+                    <table class="table">
+                        <tr><td colspan=4> {{pseudo}} </td></tr>
+                        <tr style="background-color: black; color:white"><td >Date</td> <td>    Nombre de Reponse </td> <td>Temps</td>  <td>Score</td></tr> 
+                        
+                        <tr ng-repeat= "historique in historiques">                                 
+                                <td class="table-active">{{historique.date | date:"dd/MM/yyyy"}}</td>   
+                                <td class="table-active">   {{historique.nbreponse}}</td>   
+                                <td class="table-active">   {{historique.temps}}</td>   
+                                <td class="table-active">   {{historique.score}}</td>                               
+                        </tr>   
+                    </table>
+                </div>
+            </div>
+             <!--Affichage de l'histoique de defi------------------------------------------------>
+      <div ng-show="showhistoriquedefi" class="row">
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-6">
+          <table class="table table-bodered">
+            <tr><td colspan=4> {{pseudo}} </td></tr>
+            <tr style="background-color: black; color:white"><td >Date</td> <td>  ID user Defiant </td> <td>ID user defié</td>  <td>ID du gagnant</td><td>Trophet</td></tr> 
+            
+            <tr ng-repeat= "historique in historiquedef">               
+                <td class="table-active">{{historique.date | date:"dd/MM/yyyy"}}</td> 
+                <td class="table-active"> {{historique.id_users_defiant}}</td> 
+                <td class="table-active"> {{historique.id_users_defie}}</td> 
+                <td class="table-active"> {{historique.id_users_gagnant}}</td>   
+                <td class="table-active"> {{historique.trophet}}</td>            
+            </tr> 
+          </table>
+        </div>
+      </div>
+            
+            <!--Affichage de tous les utilisateurs---------------------------------------------------------------------------------------------->
+            <div class="row" ng-show="listusers">
+        <div class=col-md-3>
+
+        </div>
+        <div style="height: 400px;overflow: scroll;">
+                <table>
+                    <tr><td>Identifiant</td><td>Nom</td><td>Prenom</td><td>Date de Naissance</td><td>Defier</td></tr>   
+                    <tr ng_repeat="user in users" class="table table-striped">
+                                <td class="table-active">{{user.identifiant}}</td>  
+                                <td class="table-active">   {{user.nom}}</td>   
+                                <td class="table-active">   {{user.prenom}}</td>    
+                                <td class="table-active">   {{user.date_de_naissance| date:"dd/MM/yyyy"}}</td>  
+                <td><button class="btn btn-lg btn-block" ng-click="lancerdefi(user.id)">Defier</button></td>
+                    </tr>           
+                </table>
+      </div>
+            </div>
+
+      <!--Afficher tous les defis---------------------------------------------------------------------------------------->
+      <div class="row" ng-show="defidisplayok">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <h2>Defie effacer avec succès</h2>
+        </div>
+      </div>
+      <div class="row" ng-show="defidisplay">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+          <table class="table table-striped">
+          <tr style="background-color:black;color:white;"><td>ID Defié</td><td>Nom defié</td><td>ID Defiant</td><td>Accepter</td><td>Refuser</td></tr> 
+          <tr class="table table-striped">
+                <td class="table-active">{{defiantList[1]}}</td> 
+                <td class="table-active"> {{defiantList[2]}}</td>  
+                <td class="table-active"> {{defiantList[0]}}</td> 
+                 
+                <td><button class="btn btn-lg btn-block" ng-click="accepterdefi(defiantList[0],defiantList[1])">Accepter</button></td>
+                <td><button class="btn btn-lg btn-block" ng-click="refuserdefi(defiantList[0],defiantList[1])">Refuser</button></td>
+          </tr>     
+        </table>
+        </div>
+      </div>
+        
+        <!--Modification du profil de lutilisateur---------------------------------------------------------------------------------------->
+        <div class="row" ng-show="userprofilok">
+          <div class="col-md-3"></div>
+          <div class="col-md-6">
+             <h2>Profil mis à jour avec succès</h2>
+          </div>
+        </div>
+        <div class="row" ng-show="userprofil">
+          <div class="col-md-3">
+
+          </div>
+            <div class="col-md-6">
+            <h2>Mise a jour du Profil de l'Utilisateur</h2>
+            <form ng-submit="updateuser()" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Identifiant</label>
+                <input type= "text" name="userIdentifiant" class="form-control" ng-model='userIdentifiant'><br/>
+                </div>
+            <div class="form-group">
+                 <label>Nom</label>
+                <input type= "text" name="userNom" id="userNom" class="form-control" ng-model='userNom'>
+                </div>
+                <div class="form-group">
+                <label>Prenom</label>
+                <input type= "text" name="userPrenom" class="form-control" ng-model='userPrenom'><br/>
+                </div>
+                <!--<div class="form-group">
+                <label>Mot de passe</label>
+                <input type= "text" name="pass" class="form-control" value="" ng-model='userPass' ng-value="profil.motpass"><br/>
+                </div>-->
+                <div class="form-group">
+                <label>Date de Naissance</label>
+                <input type= "text" name="userDate" class="form-control" ng-model='userDate'><br/>
+                </div>
+                
+                
+                <input type= "submit" class="form-control btn btn-success" value="Update">
+
+        </form>
+        </div>
+        </div>
+                <p ng-bind="updateStatus"></p>
+</div>
+</div>
+
+<footer>
+<center>Le jeux du morpion - All right reserved</center>
+</footer>
+
+</body>
+</html>
